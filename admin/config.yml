@@ -2,7 +2,7 @@
 # Chaque enregistrement crée une modification dans le dépôt GitHub ; le site se met à jour en 1 à 2 minutes.
 backend:
   name: github
-  repo: marhabaneong/ongmarhabane
+  repo: marhabaneong/ongmarhaba
   branch: main
   commit_messages:
     create: "Admin : ajout de {{collection}} « {{slug}} »"
@@ -11,8 +11,8 @@ backend:
     uploadMedia: "Admin : ajout du fichier {{path}}"
     deleteMedia: "Admin : suppression du fichier {{path}}"
 
-site_url: https://marhabaneong.github.io/ongmarhabane/
-display_url: https://marhabaneong.github.io/ongmarhabane/
+site_url: https://marhabaneong.github.io/ongmarhaba/
+display_url: https://marhabaneong.github.io/ongmarhaba/
 logo:
   src: ../assets/img/logo-160.png
 
@@ -22,7 +22,7 @@ public_folder: /assets/uploads
 collections:
   - name: contenus
     label: Contenus du site
-    description: "Rappel : floutez toujours les visages avant d’ajouter une photo (outil : https://marhabaneong.github.io/ongmarhabane/admin/flouter.html)."
+    description: "Rappel : floutez toujours les visages avant d’ajouter une photo (outil : https://marhabaneong.github.io/ongmarhaba/admin/flouter.html)."
     files:
       - name: actualites
         label: Actualités et publications

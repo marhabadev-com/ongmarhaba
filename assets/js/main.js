@@ -16,7 +16,7 @@
   function src(p) {
     if (!p) return "";
     if (/^(https?:)?\/\//.test(p) || p.indexOf("data:") === 0) return p;
-    return p.replace(/^\/(ongmarhabane\/)?/, "");
+    return p.replace(/^\//, "");
   }
   function getJSON(name) {
     return fetch("data/" + name + ".json", { cache: "no-cache" }).then(function (r) {

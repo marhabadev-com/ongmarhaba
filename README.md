@@ -15,7 +15,7 @@ python3 -m http.server 8000
 
 1. Sur GitHub : **Settings → Pages**.
 2. *Source* : « Deploy from a branch », branche `main`, dossier `/ (root)`.
-3. Le site sera publié sur `https://marhabaneong.github.io/ongmarhabane/`.
+3. Le site sera publié sur `https://marhabaneong.github.io/ongmarhaba/`.
 
 ## Application mobile
 
@@ -25,7 +25,7 @@ Fichiers : `manifest.webmanifest`, `sw.js`, icônes `assets/img/icon-*.png`.
 
 ## Espace admin (ajouter ou supprimer des contenus)
 
-Adresse : `https://marhabaneong.github.io/ongmarhabane/admin/`
+Adresse : `https://marhabaneong.github.io/ongmarhaba/admin/`
 
 Contenus modifiables sans code : actualités et publications, galerie photos, chiffres clés, partenaires, coordonnées.
 Ils sont enregistrés dans le dossier `data/` (fichiers JSON) et les fichiers envoyés dans `assets/uploads/`.
@@ -33,10 +33,10 @@ Chaque enregistrement crée un commit sur GitHub ; le site se met à jour en 1 �
 
 ### Se connecter
 
-1. Avoir un compte GitHub avec le droit d’écriture sur le dépôt `marhabaneong/ongmarhabane`
+1. Avoir un compte GitHub avec le droit d’écriture sur le dépôt `marhabaneong/ongmarhaba`
    (le compte marhabaneong, ou un collaborateur ajouté dans Settings → Collaborators).
 2. Créer un jeton d’accès : https://github.com/settings/personal-access-tokens/new
-   - *Repository access* : « Only select repositories » → `ongmarhabane`
+   - *Repository access* : « Only select repositories » → `ongmarhaba`
    - *Permissions* → *Contents* : « Read and write »
    - Choisir une date d’expiration, puis « Generate token » et copier le jeton.
 3. Ouvrir l’espace admin, choisir **« Se connecter avec un jeton d’accès »** et coller le jeton.
