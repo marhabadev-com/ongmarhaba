@@ -17,10 +17,46 @@ python3 -m http.server 8000
 2. *Source* : « Deploy from a branch », branche `main`, dossier `/ (root)`.
 3. Le site sera publié sur `https://marhabaneong.github.io/ongmarhabane/`.
 
+## Application mobile
+
+Le site est une application web installable (PWA) : sur Android, le bouton « Installer l’application » apparaît dans le menu ;
+sur iPhone, Safari → Partager → « Sur l’écran d’accueil ». L’application fonctionne aussi hors connexion pour les pages déjà vues.
+Fichiers : `manifest.webmanifest`, `sw.js`, icônes `assets/img/icon-*.png`.
+
+## Espace admin (ajouter ou supprimer des contenus)
+
+Adresse : `https://marhabaneong.github.io/ongmarhabane/admin/`
+
+Contenus modifiables sans code : actualités et publications, galerie photos, chiffres clés, partenaires, coordonnées.
+Ils sont enregistrés dans le dossier `data/` (fichiers JSON) et les fichiers envoyés dans `assets/uploads/`.
+Chaque enregistrement crée un commit sur GitHub ; le site se met à jour en 1 à 2 minutes.
+
+### Se connecter
+
+1. Avoir un compte GitHub avec le droit d’écriture sur le dépôt `marhabaneong/ongmarhabane`
+   (le compte marhabaneong, ou un collaborateur ajouté dans Settings → Collaborators).
+2. Créer un jeton d’accès : https://github.com/settings/personal-access-tokens/new
+   - *Repository access* : « Only select repositories » → `ongmarhabane`
+   - *Permissions* → *Contents* : « Read and write »
+   - Choisir une date d’expiration, puis « Generate token » et copier le jeton.
+3. Ouvrir l’espace admin, choisir **« Se connecter avec un jeton d’accès »** et coller le jeton.
+   (Le bouton « Se connecter avec GitHub » demanderait un serveur d’authentification supplémentaire : ne pas l’utiliser.)
+
+Ne partagez jamais le jeton. S’il est perdu, supprimez-le sur GitHub et créez-en un nouveau.
+
+### Photos : toujours flouter les visages
+
+Avant d’ajouter une photo, passez-la dans l’outil `admin/flouter.html` (« Flouter les visages ») :
+il détecte les visages directement sur l’appareil, permet d’ajouter ceux qui manquent en touchant la photo,
+puis enregistre une copie floutée à envoyer dans l’espace admin.
+L’outil utilise le modèle de détection YuNet (OpenCV Zoo, licence MIT) et onnxruntime-web.
+
 ## Structure
 
 ```
 index.html              page unique (toutes les sections)
+data/                   contenus modifiables depuis l’espace admin (JSON)
+admin/                  espace admin (Sveltia CMS) et outil de floutage des visages
 assets/css/style.css    styles (palette verte du logo)
 assets/js/main.js       menu, diaporama, compteurs, galerie, visionneuse, formulaire
 assets/img/             logo, favicons, photos (photos/ = grand format, thumbs/ = vignettes)
@@ -33,12 +69,6 @@ Les éléments à compléter sont signalés sur le site par un fond hachuré et 
 Rechercher `class="todo"` dans `index.html` :
 
 - adresse du siège (non affichée pour l’instant).
-
-## Ajouter des photos
-
-1. Redimensionner l’image (1600 px max pour `photos/`, 640 px pour `thumbs/`), même nom de fichier dans les deux dossiers.
-2. Ajouter une ligne dans le tableau `PHOTOS` de `assets/js/main.js` : `["nom-du-fichier", "categorie", "Légende"]`.
-   Catégories : `agri`, `formation`, `dotation`, `appui`.
 
 ## Formulaire de contact
 

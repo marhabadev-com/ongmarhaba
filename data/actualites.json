@@ -1,0 +1,20 @@
+{
+  "actualites": [
+    {
+      "titre": "Mise en place et fonctionnement des commissions foncières de base (COFOB)",
+      "date": "",
+      "type": "Publication",
+      "image": "/assets/img/thumbs/wa0150.jpg",
+      "resume": "35 COFOB créées et équipées, 4 COFOCOM redynamisées et 177 membres formés dans les communes de Dogo, Gaffati, Yaouri et Kantché.",
+      "fichier": "/assets/docs/note-information-cofob.pdf"
+    },
+    {
+      "titre": "Renforcement des capacités des SCAP/RU et des OSV en matière d’alerte précoce",
+      "date": "",
+      "type": "Publication",
+      "image": "/assets/img/thumbs/wa0155.jpg",
+      "resume": "14 SCAP/RU et 4 OSV formés et équipés pour mieux anticiper les risques dans la zone GIZ/SARES Zinder.",
+      "fichier": "/assets/docs/note-information-scap-ru.pdf"
+    }
+  ]
+}

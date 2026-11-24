@@ -1,7 +1,35 @@
-/* ONG Marhaba · interactions du site */
+/* ONG Marhaba · interactions du site
+   Les contenus modifiables (chiffres, galerie, actualités, partenaires, contact)
+   sont lus dans le dossier data/ : ils se modifient depuis l'espace admin (/admin/). */
 (function () {
   "use strict";
   document.documentElement.classList.remove("no-js");
+
+  /* ---------- Outils ---------- */
+  function esc(t) {
+    return String(t == null ? "" : t).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  /* Les chemins enregistrés par l'admin commencent par « / » : on les rend relatifs
+     pour que le site fonctionne aussi dans un sous-dossier (GitHub Pages). */
+  function src(p) {
+    if (!p) return "";
+    if (/^(https?:)?\/\//.test(p) || p.indexOf("data:") === 0) return p;
+    return p.replace(/^\/(ongmarhabane\/)?/, "");
+  }
+  function getJSON(name) {
+    return fetch("data/" + name + ".json", { cache: "no-cache" }).then(function (r) {
+      if (!r.ok) throw new Error(name);
+      return r.json();
+    });
+  }
+  function fmtDate(d) {
+    if (!d) return "";
+    var t = new Date(d);
+    if (isNaN(t)) return esc(d);
+    return t.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  }
 
   /* ---------- En-tête au défilement ---------- */
   var header = document.querySelector(".header");
@@ -27,7 +55,7 @@
     var spy = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
         if (en.isIntersecting && links[en.target.id]) {
-          Object.values(links).forEach(function (l) { l.classList.remove("is-current"); });
+          Object.keys(links).forEach(function (k) { links[k].classList.remove("is-current"); });
           links[en.target.id].classList.add("is-current");
         }
       });
@@ -48,7 +76,7 @@
   dots.forEach(function (d, i) { d.addEventListener("click", function () { show(i); play(); }); });
   if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) play();
 
-  /* ---------- Compteurs animés ---------- */
+  /* ---------- Compteurs et apparition au défilement ---------- */
   function countUp(el) {
     var target = +el.dataset.count, start = null, dur = 1600;
     function step(t) {
@@ -59,87 +87,113 @@
     }
     requestAnimationFrame(step);
   }
-
-  /* ---------- Apparition au défilement ---------- */
-  if ("IntersectionObserver" in window) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (!en.isIntersecting) return;
-        en.target.classList.add("is-visible");
-        if (en.target.dataset.count) countUp(en.target);
-        io.unobserve(en.target);
-      });
-    }, { threshold: 0.15 });
-    document.querySelectorAll(".reveal, [data-count]").forEach(function (el) { io.observe(el); });
-  } else {
-    document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("is-visible"); });
-    document.querySelectorAll("[data-count]").forEach(function (el) { el.textContent = el.dataset.count; });
+  var io = "IntersectionObserver" in window ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add("is-visible");
+      if (en.target.dataset.count) countUp(en.target);
+      io.unobserve(en.target);
+    });
+  }, { threshold: 0.15 }) : null;
+  function watch(root) {
+    (root || document).querySelectorAll(".reveal, [data-count]").forEach(function (el) {
+      if (io) io.observe(el);
+      else { el.classList.add("is-visible"); if (el.dataset.count) el.textContent = el.dataset.count; }
+    });
   }
+  watch();
+
+  /* ---------- Chiffres clés ---------- */
+  getJSON("chiffres").then(function (d) {
+    var g = document.getElementById("statsGrid");
+    g.innerHTML = (d.chiffres || []).map(function (c) {
+      return '<div class="stat"><span class="stat__num" data-count="' + (+c.nombre || 0) + '">0</span>' +
+        '<span class="stat__label">' + esc(c.libelle) + "</span></div>";
+    }).join("");
+    document.getElementById("statsSrc").textContent = d.source || "";
+    watch(g);
+  }).catch(function () {});
+
+  /* ---------- Partenaires ---------- */
+  getJSON("partenaires").then(function (d) {
+    var g = document.getElementById("partnersGrid");
+    g.innerHTML = (d.partenaires || []).map(function (p) {
+      var logo = p.logo
+        ? '<span class="partner__logo"><img src="' + esc(src(p.logo)) + '" alt="Logo ' + esc(p.nom) + '" loading="lazy"></span>'
+        : '<span class="partner__mark">' + esc(p.nom) + "</span>";
+      var inner = logo + '<span class="partner__name">' + esc(p.nom) + '</span><span class="partner__desc">' + esc(p.description) + "</span>";
+      return p.lien
+        ? '<a class="partner reveal" href="' + esc(p.lien) + '" target="_blank" rel="noopener">' + inner + "</a>"
+        : '<div class="partner reveal">' + inner + "</div>";
+    }).join("");
+    watch(g);
+  }).catch(function () {});
+
+  /* ---------- Actualités et publications ---------- */
+  getJSON("actualites").then(function (d) {
+    var items = (d.actualites || []).slice().sort(function (a, b) { return (b.date || "").localeCompare(a.date || ""); });
+    var g = document.getElementById("newsGrid");
+    if (!items.length) { g.innerHTML = '<p class="news__empty">Aucune actualité pour le moment.</p>'; return; }
+    g.innerHTML = items.map(function (n) {
+      var href = n.fichier ? src(n.fichier) : (n.lien || "");
+      var tag = href ? "a" : "article";
+      var attrs = href ? ' href="' + esc(href) + '" target="_blank" rel="noopener"' : "";
+      var meta = [n.type, fmtDate(n.date)].filter(Boolean).join(" · ");
+      var action = n.fichier ? "Télécharger" : (n.lien ? "Lire la suite" : "");
+      return "<" + tag + ' class="news-card reveal"' + attrs + ">" +
+        (n.image ? '<div class="news-card__img"><img src="' + esc(src(n.image)) + '" alt="" loading="lazy"></div>' : "") +
+        '<div class="news-card__body"><span class="news-card__type">' + esc(meta) + "</span>" +
+        "<h3>" + esc(n.titre) + "</h3>" + (n.resume ? "<p>" + esc(n.resume) + "</p>" : "") +
+        (action ? '<span class="link-arrow">' + action + "</span>" : "") + "</div></" + tag + ">";
+    }).join("");
+    watch(g);
+  }).catch(function () {});
+
+  /* ---------- Contact ---------- */
+  var EMAILS = ["ongmarh@yahoo.com"];
+  getJSON("contact").then(function (d) {
+    EMAILS = (d.emails && d.emails.length) ? d.emails : EMAILS;
+    var ic = {
+      mail: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+      tel: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
+      pin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>'
+    };
+    var tel = d.telephone ? d.telephone.replace(/[^\d+]/g, "") : "";
+    var mails = EMAILS.map(function (m) { return '<a href="mailto:' + esc(m) + '">' + esc(m) + "</a>"; });
+    var html = '<li>' + ic.mail + "<div><span>E-mail</span>" + mails.join("<br>") + "</div></li>";
+    if (d.telephone) html += "<li>" + ic.tel + '<div><span>Téléphone</span><a href="tel:' + esc(tel) + '">' + esc(d.telephone) + "</a></div></li>";
+    if (d.adresse) html += "<li>" + ic.pin + "<div><span>Adresse</span><b>" + esc(d.adresse) + "</b></div></li>";
+    document.getElementById("contactList").innerHTML = html;
+    document.getElementById("footerContact").innerHTML =
+      mails.map(function (m) { return "<li>" + m + "</li>"; }).join("") +
+      (d.telephone ? '<li><a href="tel:' + esc(tel) + '">' + esc(d.telephone) + "</a></li>" : "") +
+      (d.adresse ? "<li>" + esc(d.adresse) + "</li>" : "");
+  }).catch(function () {});
 
   /* ---------- Galerie ---------- */
-  var PHOTOS = [
-    ["wa0138", "agri", "Démonstration pratique au champ avec les producteurs et productrices"],
-    ["wa0140", "agri", "Parcelle de mil en pleine croissance"],
-    ["wa0137", "agri", "Préparation de traitements naturels lors d’une formation au champ"],
-    ["wa0139", "agri", "Animation d’une séance de formation en plein champ"],
-    ["wa0141", "agri", "Productrices et producteurs lors d’une démonstration"],
-    ["wa0142", "agri", "Visite d’une parcelle de démonstration"],
-    ["wa0143", "agri", "Échanges entre participants pendant la formation au champ"],
-    ["wa0144", "agri", "Jeune producteur présentant les intrants préparés"],
-    ["wa0145", "agri", "Restitution d’une séance pratique sur le terrain"],
-    ["wa0146", "dotation", "Remise d’un kit d’équipement à une structure communautaire"],
-    ["wa0147", "dotation", "Remise de matériel informatique au comité sous-régional de Matamey"],
-    ["wa0150", "dotation", "Membres d’une commission foncière avec leur kit d’équipement"],
-    ["wa0165", "dotation", "Commission foncière de base de Dogo et son kit d’équipement"],
-    ["wa0148", "formation", "Atelier de formation en salle avec les membres des structures locales"],
-    ["wa0154", "formation", "Sensibilisation sur la nutrition des enfants et des femmes, SCAP/RU de Dogo"],
-    ["wa0151", "formation", "Séance de sensibilisation communautaire à l’aide de supports illustrés"],
-    ["wa0155", "formation", "Échanges autour des boîtes à images de sensibilisation"],
-    ["wa0153", "formation", "Participation des femmes à une séance de sensibilisation"],
-    ["wa0156", "formation", "Séance de sensibilisation sous un hangar communautaire"],
-    ["wa0157", "formation", "Animation d’une causerie éducative"],
-    ["wa0158", "formation", "Causerie éducative avec les membres de la communauté"],
-    ["wa0152", "formation", "Réunion d’échange avec les membres d’une structure communautaire"],
-    ["wa0159", "formation", "Photo de groupe à l’issue d’une session de formation"],
-    ["wa0160", "formation", "Restitution des travaux de groupe"],
-    ["wa0161", "formation", "Visite de terrain dans un établissement communautaire"],
-    ["wa0162", "formation", "Assemblée villageoise sous l’arbre à palabre"],
-    ["wa0163", "formation", "Rencontre avec les communautés sur le terrain"],
-    ["wa0164", "formation", "Réunion communautaire en plein air"],
-    ["wa0176", "appui", "Distribution de vivres aux ménages vulnérables"],
-    ["wa0172", "appui", "Ménages bénéficiaires réunis pour la distribution"],
-    ["wa0173", "appui", "Remise d’un lot de vivres à une bénéficiaire"],
-    ["wa0174", "appui", "Bénéficiaire avec son lot de vivres"],
-    ["wa0175", "appui", "Organisation de la distribution sur le site"],
-    ["wa0177", "appui", "Lots de vivres prêts à être remis aux ménages"],
-    ["wa0178", "appui", "Bénéficiaires recevant leurs lots"],
-    ["wa0179", "appui", "Vérification des lots avant remise"],
-    ["wa0180", "appui", "Bénéficiaire avec son lot de céréales et d’huile"],
-    ["wa0181", "appui", "Retour des bénéficiaires après la distribution"],
-    ["wa0182", "appui", "Bénéficiaire emportant son lot de vivres"],
-    ["wa0183", "appui", "Bénéficiaire avec son lot de vivres"],
-    ["wa0184", "appui", "Vue d’ensemble du site de distribution"],
-    ["wa0187", "appui", "Bénéficiaires et lots de vivres"]
-  ];
-  /* Vue « Tout » : on alterne les catégories pour varier les images */
-  var MIXED = (function () {
-    var groups = {}, order = [], out = [];
-    PHOTOS.forEach(function (p) { if (!groups[p[1]]) { groups[p[1]] = []; order.push(p[1]); } groups[p[1]].push(p); });
-    for (var i = 0; out.length < PHOTOS.length; i++) order.forEach(function (k) { if (groups[k][i]) out.push(groups[k][i]); });
-    return out;
-  })();
+  var PHOTOS = [], MIXED = [];
   var grid = document.getElementById("masonry");
   var moreBtn = document.getElementById("moreBtn");
   var filter = "all", limit = 12, visible = [];
 
   function render() {
-    var list = filter === "all" ? MIXED : PHOTOS.filter(function (p) { return p[1] === filter; });
+    var list = filter === "all" ? MIXED : PHOTOS.filter(function (p) { return p.categorie === filter; });
     visible = list.slice(0, limit);
     grid.innerHTML = visible.map(function (p, i) {
-      return '<figure tabindex="0" data-i="' + i + '"><img src="assets/img/thumbs/' + p[0] + '.jpg" alt="' + p[2] + '" loading="lazy"><figcaption>' + p[2] + "</figcaption></figure>";
+      return '<figure tabindex="0" data-i="' + i + '"><img src="' + esc(src(p.vignette || p.image)) + '" alt="' + esc(p.legende) +
+        '" loading="lazy"><figcaption>' + esc(p.legende) + "</figcaption></figure>";
     }).join("");
     moreBtn.hidden = list.length <= limit;
   }
+  getJSON("galerie").then(function (d) {
+    PHOTOS = d.photos || [];
+    /* Vue « Tout » : on alterne les catégories pour varier les images */
+    var groups = {}, order = [];
+    PHOTOS.forEach(function (p) { if (!groups[p.categorie]) { groups[p.categorie] = []; order.push(p.categorie); } groups[p.categorie].push(p); });
+    MIXED = [];
+    for (var i = 0; MIXED.length < PHOTOS.length; i++) order.forEach(function (k) { if (groups[k][i]) MIXED.push(groups[k][i]); });
+    render();
+  }).catch(function () {});
   document.querySelectorAll(".filters button").forEach(function (b) {
     b.addEventListener("click", function () {
       document.querySelectorAll(".filters button").forEach(function (x) { x.classList.remove("is-active"); });
@@ -147,7 +201,6 @@
     });
   });
   moreBtn.addEventListener("click", function () { limit += 12; render(); });
-  render();
 
   /* ---------- Visionneuse ---------- */
   var lb = document.getElementById("lightbox"), lbImg = document.getElementById("lbImg"), lbCap = document.getElementById("lbCap");
@@ -155,8 +208,8 @@
   function openLb(i) {
     idx = (i + visible.length) % visible.length;
     var p = visible[idx];
-    lbImg.src = "assets/img/photos/" + p[0] + ".jpg"; lbImg.alt = p[2];
-    lbCap.textContent = p[2] + "  ·  " + (idx + 1) + " / " + visible.length;
+    lbImg.src = src(p.image); lbImg.alt = p.legende || "";
+    lbCap.textContent = (p.legende || "") + "  ·  " + (idx + 1) + " / " + visible.length;
     if (lb.hidden) { lastFocus = document.activeElement; lb.hidden = false; document.body.style.overflow = "hidden"; lb.querySelector(".lightbox__close").focus(); }
   }
   function closeLb() { lb.hidden = true; document.body.style.overflow = ""; if (lastFocus) lastFocus.focus(); }
@@ -186,9 +239,32 @@
     if (!ok) { note.textContent = "Merci de remplir correctement les champs obligatoires."; return; }
     var d = new FormData(form);
     var body = d.get("message") + "\n\n" + d.get("nom") + " (" + d.get("email") + ")";
-    window.location.href = "mailto:ongmarh@yahoo.com?cc=marhabaneong@gmail.com&subject=" + encodeURIComponent("[Site web] " + d.get("objet")) + "&body=" + encodeURIComponent(body);
+    var cc = EMAILS.slice(1).join(",");
+    window.location.href = "mailto:" + EMAILS[0] + "?" + (cc ? "cc=" + encodeURIComponent(cc) + "&" : "") +
+      "subject=" + encodeURIComponent("[Site web] " + d.get("objet")) + "&body=" + encodeURIComponent(body);
     note.textContent = "Merci ! Votre messagerie s’ouvre pour envoyer le message.";
   });
 
   var y = document.getElementById("year"); if (y) y.textContent = new Date().getFullYear();
+
+  /* ---------- Application installable (PWA) ---------- */
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+  }
+  var installBtn = document.getElementById("installBtn"), deferred = null;
+  var standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferred = e; installBtn.hidden = false; });
+  if (isIOS && !standalone) installBtn.hidden = false;
+  installBtn.addEventListener("click", function () {
+    if (deferred) {
+      deferred.prompt();
+      deferred.userChoice.finally(function () { deferred = null; installBtn.hidden = true; });
+    } else {
+      document.getElementById("iosHelp").hidden = false;
+    }
+  });
+  window.addEventListener("appinstalled", function () { installBtn.hidden = true; });
+  var iosClose = document.querySelector("#iosHelp button");
+  if (iosClose) iosClose.addEventListener("click", function () { document.getElementById("iosHelp").hidden = true; });
 })();

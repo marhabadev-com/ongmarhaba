@@ -1,0 +1,111 @@
+# Configuration de l'espace admin (Sveltia CMS)
+# Chaque enregistrement crée une modification dans le dépôt GitHub ; le site se met à jour en 1 à 2 minutes.
+backend:
+  name: github
+  repo: marhabaneong/ongmarhabane
+  branch: main
+  commit_messages:
+    create: "Admin : ajout de {{collection}} « {{slug}} »"
+    update: "Admin : mise à jour de {{collection}} « {{slug}} »"
+    delete: "Admin : suppression de {{collection}} « {{slug}} »"
+    uploadMedia: "Admin : ajout du fichier {{path}}"
+    deleteMedia: "Admin : suppression du fichier {{path}}"
+
+site_url: https://marhabaneong.github.io/ongmarhabane/
+display_url: https://marhabaneong.github.io/ongmarhabane/
+logo:
+  src: ../assets/img/logo-160.png
+
+media_folder: assets/uploads
+public_folder: /assets/uploads
+
+collections:
+  - name: contenus
+    label: Contenus du site
+    description: "Rappel : floutez toujours les visages avant d’ajouter une photo (outil : https://marhabaneong.github.io/ongmarhabane/admin/flouter.html)."
+    files:
+      - name: actualites
+        label: Actualités et publications
+        file: data/actualites.json
+        format: json
+        fields:
+          - name: actualites
+            label: Actualités
+            label_singular: actualité
+            widget: list
+            summary: "{{fields.titre}}"
+            fields:
+              - { name: titre, label: Titre, widget: string }
+              - { name: date, label: Date, widget: datetime, time_format: false, date_format: "DD/MM/YYYY", format: "YYYY-MM-DD", required: false }
+              - name: type
+                label: Type
+                widget: select
+                options: [Actualité, Publication, Rapport, Événement]
+                default: Actualité
+              - { name: image, label: Photo, widget: image, required: false, hint: "Photo avec les visages floutés (outil « Flouter les visages »)." }
+              - { name: resume, label: Résumé, widget: text, required: false }
+              - { name: fichier, label: Document PDF, widget: file, required: false, hint: "Facultatif. Vérifiez que les photos du document sont floutées." }
+              - { name: lien, label: Lien externe, widget: string, required: false, hint: "Facultatif, par exemple un article de presse." }
+
+      - name: galerie
+        label: Galerie photos
+        file: data/galerie.json
+        format: json
+        fields:
+          - name: photos
+            label: Photos
+            label_singular: photo
+            widget: list
+            summary: "{{fields.legende}}"
+            fields:
+              - { name: image, label: Photo, widget: image, hint: "Floutez d’abord les visages avec l’outil « Flouter les visages »." }
+              - { name: vignette, label: Vignette, widget: image, required: false, hint: "Facultatif : laissez vide pour les nouvelles photos." }
+              - name: categorie
+                label: Catégorie
+                widget: select
+                options:
+                  - { label: Agriculture, value: agri }
+                  - { label: Formations, value: formation }
+                  - { label: Dotations, value: dotation }
+                  - { label: Appui aux ménages, value: appui }
+              - { name: legende, label: Légende, widget: string }
+
+      - name: chiffres
+        label: Chiffres clés
+        file: data/chiffres.json
+        format: json
+        fields:
+          - name: chiffres
+            label: Chiffres
+            label_singular: chiffre
+            widget: list
+            summary: "{{fields.nombre}} {{fields.libelle}}"
+            fields:
+              - { name: nombre, label: Nombre, widget: number, value_type: int }
+              - { name: libelle, label: Libellé, widget: string }
+          - { name: source, label: Source des chiffres, widget: string, required: false }
+
+      - name: partenaires
+        label: Partenaires
+        file: data/partenaires.json
+        format: json
+        fields:
+          - name: partenaires
+            label: Partenaires
+            label_singular: partenaire
+            widget: list
+            summary: "{{fields.nom}}"
+            fields:
+              - { name: nom, label: Nom, widget: string }
+              - { name: description, label: Description, widget: string, required: false }
+              - { name: logo, label: Logo, widget: image, required: false }
+              - { name: lien, label: Site web, widget: string, required: false }
+
+      - name: contact
+        label: Coordonnées
+        file: data/contact.json
+        format: json
+        fields:
+          - { name: emails, label: Adresses e-mail, widget: list, field: { name: email, label: E-mail, widget: string } }
+          - { name: telephone, label: Téléphone, widget: string, required: false }
+          - { name: adresse, label: Adresse, widget: string, required: false }

@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Flouter les visages · ONG Marhaba</title>
+  <link rel="icon" href="../assets/img/favicon-32.png">
+  <style>
+    :root { --g9:#12300a; --g7:#2b5f14; --g6:#3a7d14; --g1:#e8f2dc; --sand:#e8b24c; --cream:#fbf8f1; --ink:#18220f; --muted:#5b6652; --line:#e4e2d6; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: var(--cream); }
+    header { background: var(--g9); color: #fff; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+    header img { width: 40px; height: 40px; border-radius: 50%; background: #fff; }
+    header h1 { font-size: 1.1rem; margin: 0; }
+    header a { margin-left: auto; color: var(--sand); font-weight: 600; text-decoration: none; font-size: .9rem; }
+    main { max-width: 1100px; margin: 0 auto; padding: 16px; }
+    .steps { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 16px; }
+    .step { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font-size: .92rem; }
+    .step b { color: var(--g6); }
+    .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+    .btn { border: 0; border-radius: 999px; padding: .7em 1.2em; font: inherit; font-weight: 600; cursor: pointer; background: var(--g6); color: #fff; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn--light { background: var(--g1); color: var(--g7); }
+    .btn--accent { background: var(--sand); color: var(--g9); }
+    label.btn input { display: none; }
+    .size { display: flex; align-items: center; gap: 8px; font-size: .9rem; }
+    #status { font-size: .92rem; color: var(--muted); min-height: 1.4em; margin: 6px 0 10px; }
+    #status.ok { color: var(--g6); font-weight: 600; }
+    .stage { position: relative; background: #fff; border: 2px dashed var(--line); border-radius: 14px; min-height: 240px; display: grid; place-items: center; overflow: hidden; }
+    .stage p { color: var(--muted); padding: 24px; text-align: center; }
+    canvas { max-width: 100%; height: auto; display: block; touch-action: manipulation; cursor: crosshair; }
+    .warn { background: #fff6e0; border: 1px solid #f0d48f; border-radius: 12px; padding: 12px 14px; font-size: .9rem; margin-top: 14px; }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="../assets/img/logo-160.png" alt="">
+    <h1>Flouter les visages avant publication</h1>
+    <a href="./">← Espace admin</a>
+  </header>
+  <main>
+    <div class="steps">
+      <div class="step"><b>1.</b> Choisissez une photo (ou prenez-la avec le téléphone).</div>
+      <div class="step"><b>2.</b> Les visages sont détectés et entourés. <b>Touchez un visage oublié</b> pour l’ajouter, touchez un cercle pour l’enlever.</div>
+      <div class="step"><b>3.</b> Vérifiez l’aperçu flouté, puis <b>enregistrez la photo</b> et ajoutez-la dans l’espace admin.</div>
+    </div>
+
+    <div class="bar">
+      <label class="btn">Choisir une photo<input type="file" id="file" accept="image/*"></label>
+      <button class="btn btn--light" id="toggle" disabled>Voir l’aperçu flouté</button>
+      <span class="size">Taille du cercle <input type="range" id="size" min="2" max="20" value="6"></span>
+      <button class="btn btn--light" id="clear" disabled>Tout effacer</button>
+      <button class="btn btn--accent" id="save" disabled>Enregistrer la photo floutée</button>
+    </div>
+    <div id="status"></div>
+    <div class="stage" id="stage"><p>Aucune photo pour l’instant.</p></div>
+
+    <div class="warn">
+      La détection automatique ne trouve pas toujours <b>tous</b> les visages (visages de profil, petits visages au fond, personnes de dos).
+      Regardez bien toute la photo avant d’enregistrer. Tout se passe sur votre appareil : la photo d’origine n’est envoyée nulle part.
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.31.1/dist/ort.wasm.min.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    var MAX = 1600, THRESH = 0.45;
+    var fileIn = document.getElementById("file"), stage = document.getElementById("stage"), statusEl = document.getElementById("status");
+    var btnToggle = document.getElementById("toggle"), btnSave = document.getElementById("save"), btnClear = document.getElementById("clear"), sizeIn = document.getElementById("size");
+    var base = null, view = null, boxes = [], preview = false, fileName = "photo", session = null;
+
+    function status(t, ok) { statusEl.textContent = t; statusEl.className = ok ? "ok" : ""; }
+
+    /* ---------- Modèle de détection (YuNet, exécuté dans le navigateur) ---------- */
+    function getSession() {
+      if (session) return Promise.resolve(session);
+      ort.env.wasm.numThreads = 1;
+      ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.31.1/dist/";
+      return ort.InferenceSession.create("yunet.onnx", { executionProviders: ["wasm"] }).then(function (s) { session = s; return s; });
+    }
+    function runTile(ctx) {
+      var d = ctx.getImageData(0, 0, 640, 640).data, n = 640 * 640, f = new Float32Array(3 * n);
+      for (var i = 0; i < n; i++) { f[i] = d[i * 4 + 2]; f[n + i] = d[i * 4 + 1]; f[2 * n + i] = d[i * 4]; } // BGR
+      var feeds = {}; feeds[session.inputNames[0]] = new ort.Tensor("float32", f, [1, 3, 640, 640]);
+      return session.run(feeds).then(function (o) {
+        var res = [];
+        [8, 16, 32].forEach(function (st) {
+          var cols = 640 / st, cls = o["cls_" + st].data, obj = o["obj_" + st].data, bb = o["bbox_" + st].data;
+          for (var k = 0; k < cls.length; k++) {
+            var sc = Math.sqrt(Math.min(Math.max(cls[k], 0), 1) * Math.min(Math.max(obj[k], 0), 1));
+            if (sc < THRESH) continue;
+            var r = Math.floor(k / cols), c = k % cols;
+            var cx = (c + bb[k * 4]) * st, cy = (r + bb[k * 4 + 1]) * st, w = Math.exp(bb[k * 4 + 2]) * st, h = Math.exp(bb[k * 4 + 3]) * st;
+            res.push([cx - w / 2, cy - h / 2, w, h, sc]);
+          }
+        });
+        return res;
+      });
+    }
+    function iou(a, b) {
+      var ix = Math.max(0, Math.min(a[0] + a[2], b[0] + b[2]) - Math.max(a[0], b[0]));
+      var iy = Math.max(0, Math.min(a[1] + a[3], b[1] + b[3]) - Math.max(a[1], b[1]));
+      var I = ix * iy; return I / (a[2] * a[3] + b[2] * b[3] - I + 1e-9);
+    }
+    function detect() {
+      var W = base.width, H = base.height, jobs = [];
+      [640, 1280, 1920].forEach(function (target) {
+        var sc = target / Math.max(W, H), w = Math.round(W * sc), h = Math.round(H * sc), step = 576;
+        for (var ty = 0; ty < Math.max(1, h - 64); ty += step)
+          for (var tx = 0; tx < Math.max(1, w - 64); tx += step) jobs.push([sc, tx, ty, w, h]);
+      });
+      var tile = document.createElement("canvas"); tile.width = tile.height = 640;
+      var tctx = tile.getContext("2d", { willReadFrequently: true }), all = [], done = 0;
+      return jobs.reduce(function (p, j) {
+        return p.then(function () {
+          tctx.fillStyle = "#000"; tctx.fillRect(0, 0, 640, 640);
+          tctx.drawImage(base, 0, 0, W, H, -j[1], -j[2], j[3], j[4]);
+          return runTile(tctx).then(function (r) {
+            r.forEach(function (b) { all.push([(b[0] + j[1]) / j[0], (b[1] + j[2]) / j[0], b[2] / j[0], b[3] / j[0], b[4]]); });
+            done++; status("Recherche des visages… " + Math.round(done / jobs.length * 100) + " %");
+          });
+        });
+      }, Promise.resolve()).then(function () {
+        all.sort(function (a, b) { return b[4] - a[4]; });
+        var keep = [];
+        all.forEach(function (b) {
+          if (b[2] > W * 0.11 && b[4] < 0.65) return; // grandes détections peu sûres : souvent des erreurs
+          if (keep.every(function (k) { return iou(b, k) < 0.3; })) keep.push(b);
+        });
+        return keep;
+      });
+    }
+
+    /* ---------- Affichage et floutage ---------- */
+    function ellipse(b) { // zone floutée un peu plus grande que le visage
+      var s = Math.max(b[2], b[3]);
+      return { cx: b[0] + b[2] / 2, cy: b[1] + b[3] / 2 - 0.05 * b[3], rx: Math.max(s * 0.72, 7), ry: Math.max(s * 0.85, 8), s: s };
+    }
+    function blurInto(ctx) {
+      boxes.forEach(function (b) {
+        var e = ellipse(b), x0 = Math.max(0, e.cx - e.rx), y0 = Math.max(0, e.cy - e.ry);
+        var w = Math.min(base.width, e.cx + e.rx) - x0, h = Math.min(base.height, e.cy + e.ry) - y0;
+        if (w < 2 || h < 2) return;
+        var blk = Math.max(6, e.s / 3), sw = Math.max(1, Math.round(w / blk)), sh = Math.max(1, Math.round(h / blk));
+        var t = document.createElement("canvas"); t.width = sw; t.height = sh;
+        var tc = t.getContext("2d"); tc.imageSmoothingEnabled = true; tc.drawImage(ctx.canvas, x0, y0, w, h, 0, 0, sw, sh);
+        ctx.save(); ctx.beginPath(); ctx.ellipse(e.cx, e.cy, e.rx, e.ry, 0, 0, Math.PI * 2); ctx.clip();
+        ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(t, 0, 0, sw, sh, x0, y0, w, h); ctx.restore();
+      });
+    }
+    function draw() {
+      var ctx = view.getContext("2d");
+      ctx.drawImage(base, 0, 0);
+      if (preview) { blurInto(ctx); return; }
+      var lw = Math.max(2, base.width / 400);
+      boxes.forEach(function (b) {
+        var e = ellipse(b);
+        ctx.beginPath(); ctx.ellipse(e.cx, e.cy, e.rx, e.ry, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(232,178,76,.28)"; ctx.fill();
+        ctx.lineWidth = lw; ctx.strokeStyle = "#e8b24c"; ctx.stroke();
+      });
+    }
+    function counts() {
+      status(boxes.length + (boxes.length > 1 ? " zones à flouter." : " zone à flouter.") + " Touchez la photo pour ajouter ou retirer un cercle.", true);
+      btnSave.disabled = btnToggle.disabled = btnClear.disabled = false;
+    }
+
+    function onTap(ev) {
+      if (!base) return;
+      var r = view.getBoundingClientRect(), x = (ev.clientX - r.left) * base.width / r.width, y = (ev.clientY - r.top) * base.height / r.height;
+      if (preview) { preview = false; btnToggle.textContent = "Voir l’aperçu flouté"; }
+      for (var i = boxes.length - 1; i >= 0; i--) {
+        var e = ellipse(boxes[i]), dx = (x - e.cx) / e.rx, dy = (y - e.cy) / e.ry;
+        if (dx * dx + dy * dy <= 1) { boxes.splice(i, 1); draw(); counts(); return; }
+      }
+      var s = base.width * sizeIn.value / 100;
+      boxes.push([x - s / 2, y - s / 2, s, s, 1]); draw(); counts();
+    }
+
+    fileIn.addEventListener("change", function () {
+      var f = fileIn.files[0]; if (!f) return;
+      fileName = f.name.replace(/\.[^.]+$/, "").replace(/[^\w-]+/g, "-").toLowerCase() || "photo";
+      var img = new Image();
+      img.onload = function () {
+        var sc = Math.min(1, MAX / Math.max(img.naturalWidth, img.naturalHeight));
+        base = document.createElement("canvas"); base.width = Math.round(img.naturalWidth * sc); base.height = Math.round(img.naturalHeight * sc);
+        base.getContext("2d").drawImage(img, 0, 0, base.width, base.height);
+        URL.revokeObjectURL(img.src);
+        view = document.createElement("canvas"); view.width = base.width; view.height = base.height;
+        view.addEventListener("click", onTap);
+        stage.innerHTML = ""; stage.appendChild(view);
+        boxes = []; preview = false; btnToggle.textContent = "Voir l’aperçu flouté"; draw();
+        btnSave.disabled = btnToggle.disabled = btnClear.disabled = true;
+        status("Chargement de l’outil de détection (la première fois peut prendre un moment)…");
+        getSession().then(detect).then(function (found) { boxes = found; draw(); counts(); })
+          .catch(function (err) {
+            console.error(err);
+            status("La détection automatique n’a pas pu démarrer. Touchez chaque visage pour le flouter à la main.");
+            btnSave.disabled = btnToggle.disabled = btnClear.disabled = false;
+          });
+      };
+      img.src = URL.createObjectURL(f);
+    });
+
+    btnToggle.addEventListener("click", function () {
+      preview = !preview; btnToggle.textContent = preview ? "Revenir aux cercles" : "Voir l’aperçu flouté"; draw();
+    });
+    btnClear.addEventListener("click", function () { boxes = []; preview = false; btnToggle.textContent = "Voir l’aperçu flouté"; draw(); counts(); });
+
+    btnSave.addEventListener("click", function () {
+      var out = document.createElement("canvas"); out.width = base.width; out.height = base.height;
+      var ctx = out.getContext("2d"); ctx.drawImage(base, 0, 0); blurInto(ctx);
+      out.toBlob(function (blob) {
+        var name = fileName + "-floutee.jpg";
+        var file = new File([blob], name, { type: "image/jpeg" });
+        if (navigator.canShare && navigator.canShare({ files: [file] }) && /android|iphone|ipad/i.test(navigator.userAgent)) {
+          navigator.share({ files: [file], title: name }).catch(function () {});
+        } else {
+          var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+        }
+        status("Photo floutée enregistrée : « " + name + " ». Ajoutez-la maintenant dans l’espace admin.", true);
+      }, "image/jpeg", 0.86);
+    });
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "chiffres": [
+    {
+      "nombre": 35,
+      "libelle": "commissions foncières de base (COFOB) mises en place"
+    },
+    {
+      "nombre": 177,
+      "libelle": "membres de COFOB et COFOCOM formés"
+    },
+    {
+      "nombre": 14,
+      "libelle": "structures d’alerte précoce SCAP/RU appuyées"
+    },
+    {
+      "nombre": 35,
+      "libelle": "villages sensibilisés à la gestion foncière"
+    }
+  ],
+  "source": "Source : notes d’information COFOB et SCAP/RU de l’ONG Marhaba."
+}

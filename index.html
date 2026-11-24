@@ -14,6 +14,11 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="assets/img/favicon-64.png">
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Marhaba">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -58,6 +63,10 @@
           <li><a href="#partenaires">Partenaires</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
+        <button class="btn btn--ghost-dark nav__install" id="installBtn" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14"/></svg>
+          Installer l’application
+        </button>
         <a href="#soutenir" class="btn btn--accent nav__cta">Nous rejoindre</a>
       </nav>
 
@@ -102,25 +111,8 @@
 
     <!-- ============ CHIFFRES CLÉS ============ -->
     <section class="stats" aria-label="Chiffres clés">
-      <div class="container stats__grid">
-        <div class="stat">
-          <span class="stat__num" data-count="35">0</span>
-          <span class="stat__label">commissions foncières de base (COFOB) mises en place</span>
-        </div>
-        <div class="stat">
-          <span class="stat__num" data-count="177">0</span>
-          <span class="stat__label">membres de COFOB et COFOCOM formés</span>
-        </div>
-        <div class="stat">
-          <span class="stat__num" data-count="14">0</span>
-          <span class="stat__label">structures d’alerte précoce SCAP/RU appuyées</span>
-        </div>
-        <div class="stat">
-          <span class="stat__num" data-count="35">0</span>
-          <span class="stat__label">villages sensibilisés à la gestion foncière</span>
-        </div>
-      </div>
-      <p class="container stats__src">Source : notes d’information COFOB et SCAP/RU de l’ONG Marhaba.</p>
+      <div class="container stats__grid" id="statsGrid"></div>
+      <p class="container stats__src" id="statsSrc"></p>
     </section>
 
     <!-- ============ QUI SOMMES-NOUS ============ -->
@@ -406,65 +398,20 @@
           <h2>Nos partenaires</h2>
           <p class="section__lead">Nous agissons avec des partenaires techniques et financiers engagés pour le développement rural du Niger.</p>
         </header>
-        <div class="partners__grid">
-          <div class="partner reveal">
-            <span class="partner__mark">ProDAF</span>
-            <span class="partner__name">Programme Niger-FIDA</span>
-            <span class="partner__desc">Programme de Développement de l’Agriculture Familiale</span>
-          </div>
-          <div class="partner reveal">
-            <span class="partner__mark">GIZ</span>
-            <span class="partner__name">GIZ · SARES</span>
-            <span class="partner__desc">Coopération allemande au développement</span>
-          </div>
-          <div class="partner reveal">
-            <span class="partner__mark">INRAN</span>
-            <span class="partner__name">INRAN</span>
-            <span class="partner__desc">Institut National de la Recherche Agronomique du Niger</span>
-          </div>
-          <div class="partner reveal">
-            <span class="partner__mark">FAFPA</span>
-            <span class="partner__name">FAFPA</span>
-            <span class="partner__desc">Partenaire technique et financier</span>
-          </div>
-        </div>
+        <div class="partners__grid" id="partnersGrid"></div>
       </div>
     </section>
 
     <!-- ============ ACTUALITÉS / PUBLICATIONS ============ -->
-    <section class="section news" id="publications">
+    <section class="section news" id="actualites">
       <div class="container">
         <header class="section__head section__head--row reveal">
           <div>
-            <p class="eyebrow">Publications</p>
-            <h2>Notes d’information et capitalisation</h2>
+            <p class="eyebrow">Actualités</p>
+            <h2>Actualités et publications</h2>
           </div>
         </header>
-        <div class="news__grid">
-          <a class="news-card reveal" href="assets/docs/note-information-cofob.pdf" target="_blank" rel="noopener">
-            <div class="news-card__img"><img src="assets/img/thumbs/wa0150.jpg" alt="" loading="lazy"></div>
-            <div class="news-card__body">
-              <span class="news-card__type">PDF · Note d’information</span>
-              <h3>Mise en place et fonctionnement des commissions foncières de base (COFOB)</h3>
-              <span class="link-arrow">Télécharger</span>
-            </div>
-          </a>
-          <a class="news-card reveal" href="assets/docs/note-information-scap-ru.pdf" target="_blank" rel="noopener">
-            <div class="news-card__img"><img src="assets/img/thumbs/wa0155.jpg" alt="" loading="lazy"></div>
-            <div class="news-card__body">
-              <span class="news-card__type">PDF · Note de capitalisation</span>
-              <h3>Renforcement des capacités des SCAP/RU et des OSV en matière d’alerte précoce</h3>
-              <span class="link-arrow">Télécharger</span>
-            </div>
-          </a>
-          <div class="news-card news-card--soon reveal">
-            <div class="news-card__body">
-              <span class="news-card__type">Bientôt</span>
-              <h3>Rapport annuel d’activités</h3>
-              <p>Nos prochains rapports et actualités seront publiés ici.</p>
-            </div>
-          </div>
-        </div>
+        <div class="news__grid" id="newsGrid"></div>
       </div>
     </section>
 
@@ -496,16 +443,7 @@
           <p class="eyebrow">Contact</p>
           <h2>Écrivez-nous</h2>
           <p>Une question, un projet, une proposition de partenariat&nbsp;? Notre équipe vous répond.</p>
-          <ul class="contact__list">
-            <li>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-              <div><span>E-mail</span><a href="mailto:ongmarh@yahoo.com">ongmarh@yahoo.com</a><br><a href="mailto:marhabaneong@gmail.com">marhabaneong@gmail.com</a></div>
-            </li>
-            <li>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
-              <div><span>Téléphone</span><a href="tel:+22798313384">+227 98 31 33 84</a></div>
-            </li>
-          </ul>
+          <ul class="contact__list" id="contactList"></ul>
         </div>
 
         <form class="form reveal" id="contactForm" novalidate>
@@ -556,17 +494,13 @@
           <li><a href="#apropos">Qui sommes-nous</a></li>
           <li><a href="#projets">Projets</a></li>
           <li><a href="#galerie">Galerie</a></li>
-          <li><a href="#publications">Publications</a></li>
+          <li><a href="#actualites">Actualités</a></li>
           <li><a href="#partenaires">Partenaires</a></li>
         </ul>
       </div>
       <div>
         <h4>Contact</h4>
-        <ul>
-          <li><a href="mailto:ongmarh@yahoo.com">ongmarh@yahoo.com</a></li>
-          <li><a href="mailto:marhabaneong@gmail.com">marhabaneong@gmail.com</a></li>
-          <li><a href="tel:+22798313384">+227 98 31 33 84</a></li>
-        </ul>
+        <ul id="footerContact"></ul>
       </div>
     </div>
     <div class="container footer__bottom">
@@ -574,6 +508,15 @@
       <a href="#top" class="totop">Haut de page ↑</a>
     </div>
   </footer>
+
+  <!-- Aide à l'installation sur iPhone -->
+  <div class="ios-help" id="iosHelp" role="dialog" aria-label="Installer l’application" hidden>
+    <div class="ios-help__box">
+      <h3>Installer l’application</h3>
+      <p>Sur iPhone ou iPad, ouvrez ce site dans Safari, touchez le bouton <b>Partager</b> <span aria-hidden="true">⬆︎</span> puis <b>« Sur l’écran d’accueil »</b>.</p>
+      <button class="btn btn--primary">J’ai compris</button>
+    </div>
+  </div>
 
   <!-- Visionneuse photo -->
   <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Visionneuse de photos" hidden>

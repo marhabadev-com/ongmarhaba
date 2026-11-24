@@ -390,3 +390,30 @@ button { font: inherit; cursor: pointer; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* ---------- Logos partenaires ---------- */
+.partner { color: var(--ink); }
+.partner__logo { width: 100%; height: 120px; display: grid; place-items: center; background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 12px; box-shadow: inset 0 0 0 1px var(--line); }
+.partner__logo img { max-height: 92px; max-width: 100%; width: auto; object-fit: contain; }
+a.partner:hover { color: var(--ink); }
+
+/* ---------- Actualités ---------- */
+.news-card__body p { color: var(--muted); font-size: .94rem; margin: 0; }
+.news__empty { color: var(--muted); }
+
+/* ---------- Bouton d’installation ---------- */
+.nav__install { gap: .45em; padding: .55em 1em; border-color: rgba(255,255,255,.6); color: #fff; background: transparent; }
+.nav__install svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.nav__install:hover { background: #fff; color: var(--green-900); }
+.header.is-scrolled .nav__install { border-color: var(--green-600); color: var(--green-700); }
+.header.is-scrolled .nav__install:hover { background: var(--green-600); color: #fff; }
+.nav__install[hidden] { display: none; }
+@media (max-width: 960px) {
+  .nav__install, .header.is-scrolled .nav__install { border-color: rgba(255,255,255,.6); color: #fff; }
+}
+.ios-help { position: fixed; inset: 0; z-index: 210; background: rgba(8, 20, 4, .7); display: grid; place-items: end center; padding: 16px; }
+.ios-help[hidden] { display: none; }
+.ios-help__box { background: #fff; border-radius: 18px; padding: 24px; max-width: 420px; width: 100%; box-shadow: var(--shadow-lg); }
+.ios-help__box p { color: var(--muted); }
+.news-card__body h3 { flex: 0 0 auto; }
+.news-card__body p { flex: 1; }

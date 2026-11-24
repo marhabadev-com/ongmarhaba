@@ -1,0 +1,28 @@
+{
+  "partenaires": [
+    {
+      "nom": "Programme Niger-FIDA",
+      "description": "Programme de Développement de l’Agriculture Familiale (ProDAF)",
+      "logo": "/assets/img/partenaires/niger-fida.png",
+      "lien": ""
+    },
+    {
+      "nom": "GIZ · SARES",
+      "description": "Coopération allemande au développement",
+      "logo": "/assets/img/partenaires/giz.png",
+      "lien": ""
+    },
+    {
+      "nom": "INRAN",
+      "description": "Institut National de la Recherche Agronomique du Niger",
+      "logo": "/assets/img/partenaires/inran.png",
+      "lien": ""
+    },
+    {
+      "nom": "FAFPA",
+      "description": "Partenaire technique et financier",
+      "logo": "/assets/img/partenaires/fafpa.png",
+      "lien": ""
+    }
+  ]
+}

@@ -1,0 +1,256 @@
+{
+  "photos": [
+    {
+      "image": "/assets/img/photos/wa0138.jpg",
+      "vignette": "/assets/img/thumbs/wa0138.jpg",
+      "categorie": "agri",
+      "legende": "Démonstration pratique au champ avec les producteurs et productrices"
+    },
+    {
+      "image": "/assets/img/photos/wa0140.jpg",
+      "vignette": "/assets/img/thumbs/wa0140.jpg",
+      "categorie": "agri",
+      "legende": "Parcelle de mil en pleine croissance"
+    },
+    {
+      "image": "/assets/img/photos/wa0137.jpg",
+      "vignette": "/assets/img/thumbs/wa0137.jpg",
+      "categorie": "agri",
+      "legende": "Préparation de traitements naturels lors d’une formation au champ"
+    },
+    {
+      "image": "/assets/img/photos/wa0139.jpg",
+      "vignette": "/assets/img/thumbs/wa0139.jpg",
+      "categorie": "agri",
+      "legende": "Animation d’une séance de formation en plein champ"
+    },
+    {
+      "image": "/assets/img/photos/wa0141.jpg",
+      "vignette": "/assets/img/thumbs/wa0141.jpg",
+      "categorie": "agri",
+      "legende": "Productrices et producteurs lors d’une démonstration"
+    },
+    {
+      "image": "/assets/img/photos/wa0142.jpg",
+      "vignette": "/assets/img/thumbs/wa0142.jpg",
+      "categorie": "agri",
+      "legende": "Visite d’une parcelle de démonstration"
+    },
+    {
+      "image": "/assets/img/photos/wa0143.jpg",
+      "vignette": "/assets/img/thumbs/wa0143.jpg",
+      "categorie": "agri",
+      "legende": "Échanges entre participants pendant la formation au champ"
+    },
+    {
+      "image": "/assets/img/photos/wa0144.jpg",
+      "vignette": "/assets/img/thumbs/wa0144.jpg",
+      "categorie": "agri",
+      "legende": "Jeune producteur présentant les intrants préparés"
+    },
+    {
+      "image": "/assets/img/photos/wa0145.jpg",
+      "vignette": "/assets/img/thumbs/wa0145.jpg",
+      "categorie": "agri",
+      "legende": "Restitution d’une séance pratique sur le terrain"
+    },
+    {
+      "image": "/assets/img/photos/wa0146.jpg",
+      "vignette": "/assets/img/thumbs/wa0146.jpg",
+      "categorie": "dotation",
+      "legende": "Remise d’un kit d’équipement à une structure communautaire"
+    },
+    {
+      "image": "/assets/img/photos/wa0147.jpg",
+      "vignette": "/assets/img/thumbs/wa0147.jpg",
+      "categorie": "dotation",
+      "legende": "Remise de matériel informatique au comité sous-régional de Matamey"
+    },
+    {
+      "image": "/assets/img/photos/wa0150.jpg",
+      "vignette": "/assets/img/thumbs/wa0150.jpg",
+      "categorie": "dotation",
+      "legende": "Membres d’une commission foncière avec leur kit d’équipement"
+    },
+    {
+      "image": "/assets/img/photos/wa0165.jpg",
+      "vignette": "/assets/img/thumbs/wa0165.jpg",
+      "categorie": "dotation",
+      "legende": "Commission foncière de base de Dogo et son kit d’équipement"
+    },
+    {
+      "image": "/assets/img/photos/wa0148.jpg",
+      "vignette": "/assets/img/thumbs/wa0148.jpg",
+      "categorie": "formation",
+      "legende": "Atelier de formation en salle avec les membres des structures locales"
+    },
+    {
+      "image": "/assets/img/photos/wa0154.jpg",
+      "vignette": "/assets/img/thumbs/wa0154.jpg",
+      "categorie": "formation",
+      "legende": "Sensibilisation sur la nutrition des enfants et des femmes, SCAP/RU de Dogo"
+    },
+    {
+      "image": "/assets/img/photos/wa0151.jpg",
+      "vignette": "/assets/img/thumbs/wa0151.jpg",
+      "categorie": "formation",
+      "legende": "Séance de sensibilisation communautaire à l’aide de supports illustrés"
+    },
+    {
+      "image": "/assets/img/photos/wa0155.jpg",
+      "vignette": "/assets/img/thumbs/wa0155.jpg",
+      "categorie": "formation",
+      "legende": "Échanges autour des boîtes à images de sensibilisation"
+    },
+    {
+      "image": "/assets/img/photos/wa0153.jpg",
+      "vignette": "/assets/img/thumbs/wa0153.jpg",
+      "categorie": "formation",
+      "legende": "Participation des femmes à une séance de sensibilisation"
+    },
+    {
+      "image": "/assets/img/photos/wa0156.jpg",
+      "vignette": "/assets/img/thumbs/wa0156.jpg",
+      "categorie": "formation",
+      "legende": "Séance de sensibilisation sous un hangar communautaire"
+    },
+    {
+      "image": "/assets/img/photos/wa0157.jpg",
+      "vignette": "/assets/img/thumbs/wa0157.jpg",
+      "categorie": "formation",
+      "legende": "Animation d’une causerie éducative"
+    },
+    {
+      "image": "/assets/img/photos/wa0158.jpg",
+      "vignette": "/assets/img/thumbs/wa0158.jpg",
+      "categorie": "formation",
+      "legende": "Causerie éducative avec les membres de la communauté"
+    },
+    {
+      "image": "/assets/img/photos/wa0152.jpg",
+      "vignette": "/assets/img/thumbs/wa0152.jpg",
+      "categorie": "formation",
+      "legende": "Réunion d’échange avec les membres d’une structure communautaire"
+    },
+    {
+      "image": "/assets/img/photos/wa0159.jpg",
+      "vignette": "/assets/img/thumbs/wa0159.jpg",
+      "categorie": "formation",
+      "legende": "Photo de groupe à l’issue d’une session de formation"
+    },
+    {
+      "image": "/assets/img/photos/wa0160.jpg",
+      "vignette": "/assets/img/thumbs/wa0160.jpg",
+      "categorie": "formation",
+      "legende": "Restitution des travaux de groupe"
+    },
+    {
+      "image": "/assets/img/photos/wa0161.jpg",
+      "vignette": "/assets/img/thumbs/wa0161.jpg",
+      "categorie": "formation",
+      "legende": "Visite de terrain dans un établissement communautaire"
+    },
+    {
+      "image": "/assets/img/photos/wa0162.jpg",
+      "vignette": "/assets/img/thumbs/wa0162.jpg",
+      "categorie": "formation",
+      "legende": "Assemblée villageoise sous l’arbre à palabre"
+    },
+    {
+      "image": "/assets/img/photos/wa0163.jpg",
+      "vignette": "/assets/img/thumbs/wa0163.jpg",
+      "categorie": "formation",
+      "legende": "Rencontre avec les communautés sur le terrain"
+    },
+    {
+      "image": "/assets/img/photos/wa0164.jpg",
+      "vignette": "/assets/img/thumbs/wa0164.jpg",
+      "categorie": "formation",
+      "legende": "Réunion communautaire en plein air"
+    },
+    {
+      "image": "/assets/img/photos/wa0176.jpg",
+      "vignette": "/assets/img/thumbs/wa0176.jpg",
+      "categorie": "appui",
+      "legende": "Distribution de vivres aux ménages vulnérables"
+    },
+    {
+      "image": "/assets/img/photos/wa0172.jpg",
+      "vignette": "/assets/img/thumbs/wa0172.jpg",
+      "categorie": "appui",
+      "legende": "Ménages bénéficiaires réunis pour la distribution"
+    },
+    {
+      "image": "/assets/img/photos/wa0173.jpg",
+      "vignette": "/assets/img/thumbs/wa0173.jpg",
+      "categorie": "appui",
+      "legende": "Remise d’un lot de vivres à une bénéficiaire"
+    },
+    {
+      "image": "/assets/img/photos/wa0174.jpg",
+      "vignette": "/assets/img/thumbs/wa0174.jpg",
+      "categorie": "appui",
+      "legende": "Bénéficiaire avec son lot de vivres"
+    },
+    {
+      "image": "/assets/img/photos/wa0175.jpg",
+      "vignette": "/assets/img/thumbs/wa0175.jpg",
+      "categorie": "appui",
+      "legende": "Organisation de la distribution sur le site"
+    },
+    {
+      "image": "/assets/img/photos/wa0177.jpg",
+      "vignette": "/assets/img/thumbs/wa0177.jpg",
+      "categorie": "appui",
+      "legende": "Lots de vivres prêts à être remis aux ménages"
+    },
+    {
+      "image": "/assets/img/photos/wa0178.jpg",
+      "vignette": "/assets/img/thumbs/wa0178.jpg",
+      "categorie": "appui",
+      "legende": "Bénéficiaires recevant leurs lots"
+    },
+    {
+      "image": "/assets/img/photos/wa0179.jpg",
+      "vignette": "/assets/img/thumbs/wa0179.jpg",
+      "categorie": "appui",
+      "legende": "Vérification des lots avant remise"
+    },
+    {
+      "image": "/assets/img/photos/wa0180.jpg",
+      "vignette": "/assets/img/thumbs/wa0180.jpg",
+      "categorie": "appui",
+      "legende": "Bénéficiaire avec son lot de céréales et d’huile"
+    },
+    {
+      "image": "/assets/img/photos/wa0181.jpg",
+      "vignette": "/assets/img/thumbs/wa0181.jpg",
+      "categorie": "appui",
+      "legende": "Retour des bénéficiaires après la distribution"
+    },
+    {
+      "image": "/assets/img/photos/wa0182.jpg",
+      "vignette": "/assets/img/thumbs/wa0182.jpg",
+      "categorie": "appui",
+      "legende": "Bénéficiaire emportant son lot de vivres"
+    },
+    {
+      "image": "/assets/img/photos/wa0183.jpg",
+      "vignette": "/assets/img/thumbs/wa0183.jpg",
+      "categorie": "appui",
+      "legende": "Bénéficiaire avec son lot de vivres"
+    },
+    {
+      "image": "/assets/img/photos/wa0184.jpg",
+      "vignette": "/assets/img/thumbs/wa0184.jpg",
+      "categorie": "appui",
+      "legende": "Vue d’ensemble du site de distribution"
+    },
+    {
+      "image": "/assets/img/photos/wa0187.jpg",
+      "vignette": "/assets/img/thumbs/wa0187.jpg",
+      "categorie": "appui",
+      "legende": "Bénéficiaires et lots de vivres"
+    }
+  ]
+}
